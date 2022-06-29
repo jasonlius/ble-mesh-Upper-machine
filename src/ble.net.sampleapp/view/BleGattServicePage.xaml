@@ -8,7 +8,7 @@
                x:Class="ble.net.sampleapp.view.BleGattServicePage">
 
    <StackLayout Orientation="Vertical"
-                VerticalOptions="FillAndExpand"
+
                 HorizontalOptions="FillAndExpand">
 
       <StackLayout Orientation="Horizontal"
@@ -79,7 +79,7 @@
                                       IsEnabled="{Binding CanNotify}" />
                            </StackLayout>
 
-                           <StackLayout Orientation="Horizontal"
+                           <StackLayout 
                                         VerticalOptions="Center"
                                         HorizontalOptions="EndAndExpand"
                                         Grid.Column="2">

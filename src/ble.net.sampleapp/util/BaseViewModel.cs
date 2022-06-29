@@ -1,10 +1,4 @@
-﻿// Copyright M. Griffie <nexus@nexussays.com>
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -23,6 +17,7 @@ namespace ble.net.sampleapp.util
       /// <summary>
       /// Provides access to the PropertyChanged event handler to derived classes.
       /// </summary>
+      
       protected PropertyChangedEventHandler PropertyChangedHandler => PropertyChanged;
 
       public virtual void OnAppearing()

@@ -9,18 +9,37 @@
    </PropertyGroup>
 
    <ItemGroup>
-    <PackageReference Include="Acr.UserDialogs">
-      <Version>6.5.1</Version>
+    <PackageReference Include="ble.net" Version="1.2.1">
     </PackageReference>
-    <PackageReference Include="ble.net">
-      <Version>1.2.1</Version>
+    <PackageReference Include="nexus.core" Version="0.36.6">
     </PackageReference>
-    <PackageReference Include="nexus.core">
-      <Version>0.34.0</Version>
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2401">
     </PackageReference>
-    <PackageReference Include="Xamarin.Forms">
-      <Version>2.5.1.527436</Version>
-    </PackageReference>
+    <PackageReference Include="Acr.UserDialogs" Version="6.5.1" />
+    <PackageReference Include="OpenTl.BouncyCastle" Version="1.8.3" />
   </ItemGroup>
 
+   <ItemGroup>
+     <None Remove="Microsoft.LightSwitch.Client.JavaScript.Runtime" />
+     <None Remove="IeuanWalker.CustomSwitch" />
+     <None Remove="Syncfusion.Xamarin.Buttons" />
+     <None Remove="Acr.UserDialogs" />
+     <None Remove="BleMeshBindingLibrary _andriod11" />
+     <None Remove="Mono.Android" />
+     <None Remove="BigInteger" />
+     <None Remove="System.Security.Cryptography.Cng" />
+     <None Remove="BleMesh\" />
+     <None Remove="SshNet.Security.Cryptography" />
+     <None Remove="System.Security.Cryptography.Algorithms" />
+     <None Remove="OpenGost.Security.Cryptography" />
+     <None Remove="OpenTl.BouncyCastle" />
+   </ItemGroup>
+   <ItemGroup>
+     <Folder Include="BleMesh\" />
+   </ItemGroup>
+   <ItemGroup>
+     <Reference Include="Mono.Android" />
+     <Reference Include="Mono.Android" />
+     <Reference Include="Mono.Android" />
+   </ItemGroup>
 </Project>

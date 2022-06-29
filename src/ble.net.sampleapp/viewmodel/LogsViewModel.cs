@@ -42,7 +42,6 @@ namespace ble.net.sampleapp.viewmodel
       }
 
       public String PageTitle => "Logs";
-
       /// <inheritdoc />
       public void Handle( params ILogEntry[] entries )
       {

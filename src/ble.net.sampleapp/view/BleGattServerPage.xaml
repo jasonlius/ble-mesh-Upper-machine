@@ -27,8 +27,9 @@
             <Label Text="{Binding Manufacturer, StringFormat='Manufacturer: {0}'}"
                    HorizontalOptions="Start"
                    VerticalOptions="Center" />
+            
          </StackLayout>
-         <!-- TODO: implement the remember switch
+          <!--TODO: implement the remember switch-->
          <StackLayout Orientation="Horizontal"
                       VerticalOptions="Center"
                       HorizontalOptions="StartAndExpand"
@@ -39,12 +40,11 @@
                    HorizontalOptions="Start"
                    VerticalOptions="Center" />
             <Switch IsVisible="false"
-                    IsToggled="{Binding IsRemembered, Mode=OneWay}"
                     HorizontalOptions="Start"
                     IsEnabled="false"
                     VerticalOptions="Center" />
          </StackLayout>
-         -->
+         
          <StackLayout Orientation="Horizontal"
                       VerticalOptions="Center"
                       HorizontalOptions="EndAndExpand"
@@ -114,7 +114,6 @@
             </DataTemplate>
          </ListView.ItemTemplate>
       </ListView>
-
    </StackLayout>
 
 </util:BasePage>

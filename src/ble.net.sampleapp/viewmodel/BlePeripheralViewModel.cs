@@ -14,6 +14,10 @@ using nexus.core.text;
 using nexus.protocols.ble.scan;
 using nexus.protocols.ble.scan.advertisement;
 using Xamarin.Forms;
+using nexus.protocols.ble;
+using nexus.protocols.ble.gatt;
+using ble.net.sampleapp.viewmodel;
+
 
 namespace ble.net.sampleapp.viewmodel
 {
@@ -21,12 +25,17 @@ namespace ble.net.sampleapp.viewmodel
       : BaseViewModel,
         IEquatable<IBlePeripheral>
    {
+      private readonly IBluetoothLowEnergyAdapter m_bleAdapter;//翔哥的代码 
       private Boolean m_isExpanded;
-
-      public BlePeripheralViewModel( IBlePeripheral model, Func<BlePeripheralViewModel, Task> onSelectDevice )
+      private BleGattServerViewModel bleGattServerViewModel;
+      public ImageSource ButtonImage { get; set; }  //翔哥加的代码，为了加载图像
+      private IBleGattServerConnection _gattServer;//翔哥改的，空引用异常，没有被
+      public BlePeripheralViewModel( IBlePeripheral model, Func<BlePeripheralViewModel, Task> onSelectDevice , Func<BlePeripheralViewModel, Task> offSelectDevice)
       {
          Model = model;
          ConnectToDeviceCommand = new Command( async () => { await onSelectDevice( this ); } );
+         DisconnectedToDeviceCommand = new Command(async () => { await offSelectDevice(this); });
+         ButtonImage = ImageSource.FromFile("disconnected.png");
       }
 
       public String Address => Model.Address != null && Model.Address.Length > 0
@@ -47,6 +56,10 @@ namespace ble.net.sampleapp.viewmodel
       public String Advertisement => Model.Advertisement.ToString();
 
       public ICommand ConnectToDeviceCommand { get; }
+
+      public ICommand DisconnectedToDeviceCommand { get; }//翔哥加的代码
+
+
 
       public String DeviceName => Model.Advertisement.DeviceName;
 
@@ -98,6 +111,17 @@ namespace ble.net.sampleapp.viewmodel
          return Model.GetHashCode();
       }
 
+      public void UpdateImage(ImageSource buttonImage)
+      {
+         Console.WriteLine($"update button image.");
+
+         this.ButtonImage = buttonImage;
+
+         RaisePropertyChanged(nameof(ButtonImage));
+
+      }
+
+ 
       public void Update( IBlePeripheral model )
       {
          if(!Equals( Model, model ))
@@ -121,4 +145,5 @@ namespace ble.net.sampleapp.viewmodel
          RaisePropertyChanged( nameof(TxPowerLevel) );
       }
    }
+   
 }

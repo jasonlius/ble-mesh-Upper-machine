@@ -5,8 +5,10 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -16,24 +18,31 @@ using nexus.core.logging;
 using nexus.protocols.ble;
 using nexus.protocols.ble.scan;
 using Xamarin.Forms;
-
 namespace ble.net.sampleapp.viewmodel
 {
    public class BleDeviceScannerViewModel : AbstractScanViewModel
    {
       private readonly Func<BlePeripheralViewModel, Task> m_onSelectDevice;
+      private readonly Func<BlePeripheralViewModel, Task> m_offSelectDevice;
       private DateTime m_scanStopTime;
-
+      public int FoundDevicesCount { get; set; }//设备数量
+      public int FoundDevicesOnlineCount { get; set; }//设备连接
       public BleDeviceScannerViewModel( IBluetoothLowEnergyAdapter bleAdapter, IUserDialogs dialogs,
-                                        Func<BlePeripheralViewModel, Task> onSelectDevice )
+                                        Func<BlePeripheralViewModel, Task> onSelectDevice, Func<BlePeripheralViewModel, Task> offSelectDevice)
          : base( bleAdapter, dialogs )
       {
          m_onSelectDevice = onSelectDevice;
+         m_offSelectDevice = offSelectDevice;
          FoundDevices = new ObservableCollection<BlePeripheralViewModel>();
          ScanForDevicesCommand =
             new Command( x => { StartScan( x as Double? ?? BleSampleAppUtils.SCAN_SECONDS_DEFAULT ); } );
       }
 
+      public void UpdateFoundDevicesOnlineCount(int foundDevicesOnlineCount)
+      {
+         FoundDevicesOnlineCount += foundDevicesOnlineCount;
+         RaisePropertyChanged(nameof(FoundDevicesOnlineCount));
+      }
       public ObservableCollection<BlePeripheralViewModel> FoundDevices { get; }
 
       public ICommand ScanForDevicesCommand { get; }
@@ -42,11 +51,10 @@ namespace ble.net.sampleapp.viewmodel
          (Int32)BleSampleAppUtils.ClampSeconds( (m_scanStopTime - DateTime.UtcNow).TotalSeconds );
 
       private async void StartScan( Double seconds )
-      {
+        {
          if(IsScanning)
          {
-            return;
-         }
+            return;         }
 
          if(!IsAdapterEnabled)
          {
@@ -73,19 +81,26 @@ namespace ble.net.sampleapp.viewmodel
             } );
 
          await m_bleAdapter.ScanForBroadcasts(
-            // NOTE:
-            //
-            // You can provide a scan filter to look for particular devices. See Readme.md for more information
-            // e.g.:
-            //    new ScanFilter().SetAdvertisedManufacturerCompanyId( 224 /*Google*/ ),
-            //
-            // You can also specify additional scan settings like the amount of power to direct to the Bluetooth antenna:
-            // e.g.:
-            //    new ScanSettings()
-            //    {
-            //       Mode = ScanMode.LowPower,
-            //       Filter = new ScanFilter().SetAdvertisedManufacturerCompanyId( 224 /*Google*/ )
-            //    },
+
+            new ScanSettings()
+            {
+               // Setting the scan mode is currently only applicable to Android and has no effect on other platforms.
+               // If not provided, defaults to ScanMode.Balanced
+               Mode = ScanMode.LowPower,
+
+               // Optional scan filter to ensure that the observer will only receive peripherals
+               // that pass the filter. If you want to scan for everything around, omit the filter.
+               Filter = new ScanFilter()
+               {
+                  //AdvertisedDeviceName = "foobar",
+                  //AdvertisedManufacturerCompanyId = 76,
+                  // peripherals must advertise at-least-one of any GUIDs in this list
+                  AdvertisedServiceIsInList = new List<Guid>() { new Guid("00001828-0000-1000-8000-00805f9b34fb") },
+               },
+
+               // ignore repeated advertisements from the same device during this scan
+               IgnoreRepeatBroadcasts = false
+            },
             peripheral =>
             {
                Device.BeginInvokeOnMainThread(
@@ -98,13 +113,20 @@ namespace ble.net.sampleapp.viewmodel
                      }
                      else
                      {
-                        FoundDevices.Add( new BlePeripheralViewModel( peripheral, m_onSelectDevice ) );
+            
+                        FoundDevices.Add( new BlePeripheralViewModel( peripheral, m_onSelectDevice ,m_offSelectDevice) );
+                        
                      }
+                     FoundDevicesCount = FoundDevices.Count();
+                     RaisePropertyChanged(nameof(FoundDevicesCount));
                   } );
+              
             },
+            
             m_scanCancel.Token );
-
          IsScanning = false;
+ 
       }
+    
    }
 }

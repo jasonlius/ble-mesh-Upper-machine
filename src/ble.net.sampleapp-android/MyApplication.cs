@@ -5,6 +5,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Acr.UserDialogs;
 using Android.App;
@@ -12,8 +13,10 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.V4.Content;
 using nexus.core.logging;
 using nexus.protocols.ble;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 using Application = Android.App.Application;
@@ -72,7 +75,7 @@ namespace ble.net.sampleapp.android
    }
 
    [Activity(
-      Label = "BLE.net Sample App",
+      Label = "BleMeshAPP",
       Theme = "@style/MainTheme",
       MainLauncher = false,
       Icon = "@drawable/icon",
@@ -85,40 +88,62 @@ namespace ble.net.sampleapp.android
       /// you don't need to implement this -- you can still query the state of the adapter, the observable just won't work. See
       /// <see cref="IBluetoothLowEnergyAdapter.State" />
       /// </remarks>
+      ///
+
       protected override void OnActivityResult( Int32 requestCode, Result resultCode, Intent data )
       {
          BluetoothLowEnergyAdapter.OnActivityResult( requestCode, resultCode, data );
       }
 
-      protected override void OnCreate( Bundle bundle )
+      protected override async void OnCreate( Bundle bundle )
       {
          TabLayoutResource = Resource.Layout.Tabbar;
          ToolbarResource = Resource.Layout.Toolbar;
 
          base.OnCreate( bundle );
 
+         Xamarin.Essentials.Platform.Init(this, bundle);
          UserDialogs.Init( this );
          Forms.Init( this, bundle );
-
          // If you want to enable/disable the Bluetooth adapter from code, you must call this.
          BluetoothLowEnergyAdapter.Init( this );
          // Obtain the bluetooth adapter so we can pass it into our (shared-code) Xamarin Forms app. There are
          // additional Obtain() methods on BluetoothLowEnergyAdapter if you have more specific needs (e.g. if you
          // need to support devices with multiple Bluetooth adapters)
          var bluetooth = BluetoothLowEnergyAdapter.ObtainDefaultAdapter( ApplicationContext );
-
-         LoadApplication( new FormsApp( bluetooth, UserDialogs.Instance ) );
+        
+         LoadApplication( new FormsApp( bluetooth, UserDialogs.Instance));
+         await Permissions.RequestAsync<BLEPermission>();
       }
-   }
 
-   [Activity( Theme = "@style/AppTheme.Splash", MainLauncher = true, NoHistory = true )]
+
+   }
+  
+
+   [Activity(Theme = "@style/AppTheme.Splash", MainLauncher = true, NoHistory = true)]
    public class SplashActivity : Activity
    {
-      protected override void OnCreate( Bundle bundle )
+      protected override void OnCreate(Bundle bundle)
       {
-         base.OnCreate( bundle );
-         StartActivity( typeof(MainActivity) );
+         base.OnCreate(bundle);
+         StartActivity(typeof(MainActivity));
          Finish();
       }
    }
+
+   public class BLEPermission : Xamarin.Essentials.Permissions.BasePlatformPermission
+   {
+      public override (string androidPermission, bool isRuntime)[] RequiredPermissions => new List<(string androidPermission, bool isRuntime)>
+     {
+       (Android.Manifest.Permission.BluetoothScan, true),
+       (Android.Manifest.Permission.BluetoothConnect, true),
+       (Android.Manifest.Permission.BluetoothAdmin,true ),
+       (Android.Manifest.Permission.AccessFineLocation,true),
+       (Android.Manifest.Permission.BluetoothScan,true),
+       (Android.Manifest.Permission.BluetoothConnect,true),
+       (Android.Manifest.Permission.BluetoothAdvertise,true)
+     }.ToArray();
+   }
+
+
 }

@@ -34,5 +34,6 @@ namespace ble.net.sampleapp.view
       {
          scrollView.ScrollToAsync( logsLabel, ScrollToPosition.End, true );
       }
+      
    }
 }

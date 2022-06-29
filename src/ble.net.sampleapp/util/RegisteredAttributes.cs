@@ -28,6 +28,10 @@ namespace ble.net.sampleapp.util
             new Guid( "00001530-1212-efde-1523-785feabcd123" ),
             "Nordic Device Firmware Update Service" );
 
+         s_known.AddService(
+         new Guid("0000ffff-0000-1000-8000-00805f9b34fb"),
+             "blufi devices");
+
          AddTiService( 0xaa00, "Infrared Thermometer" );
          AddTiService( 0xaa10, "Accelerometer" );
          AddTiService( 0xaa20, "Humidity" );
@@ -37,6 +41,8 @@ namespace ble.net.sampleapp.util
          AddTiService( 0xaa60, "Test" );
          AddTiService( 0xccc0, "Connection Control" );
          AddTiService( 0xffc0, "OvertheAir Download" );
+         AddTiService( 0x2902, "blufi");
+         AddTiService( 0xffff, "blufi ffff");
 
          AddTiChar( 0xaa01, "Infrared Temperature Data" );
          AddTiChar( 0xaa02, "Infrared Temperature On/Off" );

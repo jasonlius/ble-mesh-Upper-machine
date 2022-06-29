@@ -6,6 +6,7 @@
 
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Acr.UserDialogs;
@@ -16,6 +17,7 @@ using nexus.core.text;
 using nexus.protocols.ble;
 using nexus.protocols.ble.gatt;
 using Xamarin.Forms;
+using ble.net.sampleapp.BleMesh;
 
 namespace ble.net.sampleapp.viewmodel
 {
@@ -56,13 +58,16 @@ namespace ble.net.sampleapp.viewmodel
                Device.BeginInvokeOnMainThread(
                   () =>
                   {
-                     if(x.IsFaulted)
+                     Log.Trace("Reading properties for characteristic.0 id={0}", m_characteristicGuid);
+
+                     if (x.IsFaulted)
                      {
+                        Log.Trace("Reading properties for characteristic.1 id={0}", m_characteristicGuid);
                         m_dialogManager.Toast( x.Exception.GetBaseException().Message );
                      }
                      else
                      {
-                        Log.Trace( "Reading properties for characteristic. id={0}", m_characteristicGuid );
+                        Log.Trace( "Reading properties for characteristic.2 id={0}", m_characteristicGuid );
                         m_props = x.Result;
                         RaisePropertyChanged( nameof(CanNotify) );
                         RaisePropertyChanged( nameof(CanRead) );
@@ -233,22 +238,33 @@ namespace ble.net.sampleapp.viewmodel
          }
       }
 
+      //public int seq = -1;
       private async Task WriteCurrentBytes()
       {
          var w = m_writeValue;
+         Console.WriteLine($"m_writeValue:{m_writeValue}");
          if(!w.IsNullOrEmpty())
          {
-            var val = w.DecodeAsBase16();
+
+            // todo send ble mesh proxy pdu
+            BluetoothMesh bluetoothMesh = BluetoothMesh.GetInstanace();
+            byte[] dst = Utility.HexToBytes("C105");
+            var val = bluetoothMesh.SendGenericOnOffSetUnack(dst,(byte)1);
+            //var val = bluetoothMesh.SendGenericOnOffSetUnack(dst, (byte)1);
             try
             {
+              
+               //var writeTask = m_gattServer.WriteCharacteristicValue(m_serviceGuid, m_characteristicGuid, finalData);
+              // Console.WriteLine($"m_serviceGuid:{m_serviceGuid}, m_characteristicGuid:{m_characteristicGuid}, val:{finalData[1]}, strVal:{finalData[0]}");
                IsBusy = true;
-               var writeTask = m_gattServer.WriteCharacteristicValue( m_serviceGuid, m_characteristicGuid, val );
+               Console.WriteLine($"m_serviceGuid:{m_serviceGuid}, m_characteristicGuid:{m_characteristicGuid}, val:{val[0]}, strVal:{ Encoding.UTF8.GetString(val)}.");
+               var writeTask = m_gattServer.WriteCharacteristicValue(m_serviceGuid, m_characteristicGuid, val);
                // notify UI to clear written value from input field
                WriteValue = "";
                // update the characteristic value with the awaited results of the write
-               UpdateDisplayedValue( await writeTask );
+               //UpdateDisplayedValue(await writeTask);
             }
-            catch(GattException ex)
+            catch (GattException ex)
             {
                Log.Warn( ex.ToString() );
                m_dialogManager.Toast( ex.Message );

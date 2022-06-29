@@ -15,7 +15,6 @@ using nexus.core;
 using nexus.core.logging;
 using nexus.protocols.ble;
 using Xamarin.Forms;
-
 namespace ble.net.sampleapp.viewmodel
 {
    public abstract class AbstractScanViewModel : BaseViewModel

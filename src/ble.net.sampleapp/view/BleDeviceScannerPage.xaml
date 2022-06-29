@@ -4,15 +4,15 @@
 <util:BasePage xmlns="http://xamarin.com/schemas/2014/forms"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:util="clr-namespace:ble.net.sampleapp.util;assembly=ble.net.sampleapp"
-               Title="Device Scanner"
+               Title="设备扫描器"
                x:Class="ble.net.sampleapp.view.BleDeviceScannerPage">
+   <!--默认将layout写在了这个content属性里面<util:BasePage.Content/>因此将这个忽略了-->
    <StackLayout Orientation="Vertical">
-
       <StackLayout Orientation="Horizontal"
                    Padding="{StaticResource GridPadding}">
          <StackLayout HorizontalOptions="Start"
                       Orientation="Horizontal">
-            <Label Text="Scanning"
+            <Label Text="扫描中"
                    IsVisible="{Binding IsScanning}"
                    VerticalOptions="Center" />
             <AbsoluteLayout IsVisible="{Binding IsScanning}">
@@ -28,22 +28,56 @@
                       AbsoluteLayout.LayoutFlags="PositionProportional"
                       Text="{Binding ScanTimeRemaining}" />
             </AbsoluteLayout>
-            <Button Text="Start Scan"
+            <Button Text="开始扫描"
                     IsVisible="{Binding IsScanning, Converter={StaticResource InvertBoolean}}"
                     Command="{Binding ScanForDevicesCommand}"
                     HorizontalOptions="Start" />
          </StackLayout>
          <StackLayout HorizontalOptions="EndAndExpand"
                       Orientation="Horizontal">
-            <Label Text="Bluetooth"
+            <Label Text="手机蓝牙"
                    VerticalOptions="Center" />
             <Switch IsToggled="{Binding IsAdapterEnabled, Mode=OneWay}"
                     VerticalOptions="Center"
-                    Toggled="Switch_OnToggled" />
+                    Toggled="Switch_OnToggled"
+                    >
+            </Switch>
          </StackLayout>
       </StackLayout>
-
+      <StackLayout  Margin="2">
+          <BoxView Color="SkyBlue"
+             HeightRequest="1.5"/>  
+         <StackLayout Orientation="Horizontal">
+             <Label
+             Text="总节点数:"
+             FontSize="16"
+             TextColor="Red"
+             FontAttributes="Bold"
+             HorizontalOptions="Center"/>
+             <Label
+             Text="{Binding FoundDevicesCount }"
+             FontSize="16"
+             TextColor="Red"
+             FontAttributes="Bold"
+             HorizontalOptions="Center"/>
+            <Label
+             Text="在线节点数:"
+             FontSize="16"
+             TextColor="Red"
+             FontAttributes="Bold"
+             HorizontalOptions="End"/>
+             <Label
+             Text="{Binding FoundDevicesOnlineCount }"
+             FontSize="16"
+             TextColor="Red"
+             FontAttributes="Bold"
+             HorizontalOptions="End"/>
+         </StackLayout>
+          <BoxView Color="SkyBlue"
+             HeightRequest="1.5"/>  
+      </StackLayout>
       <ListView ItemsSource="{Binding FoundDevices}"
+                x:Name="ConncetionImage"
                 ItemTapped="ListView_OnItemTapped"
                 ItemSelected="ListView_OnItemSelected"
                 HasUnevenRows="True"
@@ -56,121 +90,65 @@
                         iOS="Default"
                         WinPhone="Default" />
          </ListView.SeparatorVisibility>
-         <ListView.ItemTemplate>
-            <DataTemplate>
-               <ViewCell>
+         <ListView.ItemTemplate >
+            <DataTemplate >
+               <ViewCell >
                   <Frame Margin="{StaticResource GridPadding}"
-                         Padding="{StaticResource GridPadding}">
-
-                     <!--<StackLayout IsVisible="{Binding IsExpanded, Converter={StaticResource InvertBoolean}}"
-                                  Orientation="Vertical"
-                                  VerticalOptions="FillAndExpand"
-                                  HorizontalOptions="FillAndExpand">
-                        <StackLayout Orientation="Horizontal"
-                                     HorizontalOptions="FillAndExpand">
-                           <Label Text="{Binding Name}"
-                                  HorizontalOptions="StartAndExpand" />
-                           <Label Text="{Binding Rssi}"
-                                  HorizontalOptions="End"
-                                  MinimumWidthRequest="30" />
-                        </StackLayout>
-                        <StackLayout Orientation="Horizontal"
-                                     HorizontalOptions="FillAndExpand">
-                           <Label Text="{Binding Id}"
-                                  HorizontalOptions="StartAndExpand"
-                                  LineBreakMode="TailTruncation"
-                                  VerticalOptions="Center" />
-                           <Label Text="{Binding Manufacturer}"
-                                  HorizontalOptions="End"
-                                  VerticalOptions="Center" />
-
-                        </StackLayout>
-                     </StackLayout>-->
-
-                     <Grid RowSpacing="5">
-                        <Grid.ColumnDefinitions>
-                           <ColumnDefinition Width="Auto" />
-                           <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                           <RowDefinition Height="Auto" />
-                           <RowDefinition Height="Auto" />
-                           <RowDefinition Height="Auto" />
-                           <RowDefinition Height="Auto" />
-                           <RowDefinition Height="Auto" />
-                           <RowDefinition Height="Auto" />
-                           <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <Label Grid.Column="0"
-                               Grid.Row="0"
-                               Text="Address / Name"
-                               FontAttributes="Bold" />
-                        <Label Grid.Column="0"
-                               Grid.Row="1"
-                               Text="RSSI / Tx"
-                               FontAttributes="Bold" />
-                        <Label Grid.Column="0"
-                               Grid.Row="2"
-                               Text="Flags"
-                               FontAttributes="Bold" />
-                        <Label Grid.Column="0"
-                               Grid.Row="3"
-                               Text="Mfg. Data"
-                               FontAttributes="Bold" />
-                        <Label Grid.Column="0"
-                               Grid.Row="4"
-                               Text="Services"
-                               FontAttributes="Bold" />
-                        <Label Grid.Column="0"
-                               Grid.Row="5"
-                               Text="Service Data"
-                               FontAttributes="Bold" />
-
-                        <Label Grid.Column="1"
-                               Grid.Row="0"
-                               Text="{Binding AddressAndName}" />
-                        <Label Grid.Column="1"
-                               Grid.Row="1"
-                               Text="{Binding Signal}" />
-                        <Label Grid.Column="1"
-                               Grid.Row="2"
-                               Text="{Binding Flags}" />
-                        <Label Grid.Column="1"
-                               Grid.Row="3"
-                               Text="{Binding ManufacturerData}" />
-                        <Label Grid.Column="1"
-                               Grid.Row="4"
-                               Text="{Binding AdvertisedServices}" />
-                        <Label Grid.Column="1"
-                               Grid.Row="5"
-                               Text="{Binding ServiceData}" />
-
-                        <StackLayout Grid.Row="6"
-                                     Grid.Column="0"
-                                     Grid.ColumnSpan="2"
+                         Padding="{StaticResource GridPadding}"
+                         BorderColor="SkyBlue">
+                        <StackLayout Spacing="5"
                                      Orientation="Horizontal"
-                                     HorizontalOptions="FillAndExpand">
-                           <!-- TODO: implement the remember switch -->
-                           <Label IsVisible="false"
-                                  Text="Remember Device"
-                                  HorizontalOptions="Start"
-                                  VerticalOptions="Center" />
-                           <Switch IsVisible="false"
-                                   IsToggled="{Binding IsRemembered, Mode=OneWay}"
-                                   HorizontalOptions="Start"
-                                   IsEnabled="false"
-                                   VerticalOptions="Center" />
-                           <Button Text="Connect"
+                                     HorizontalOptions="Center"
+                                     >
+                            <Image Margin="3"
+                                   Scale="1.4"
+                               Source="{Binding ButtonImage}"/>
+                            <StackLayout HorizontalOptions="Center">
+                              <Label
+                                 Text="节点ID"
+                                 FontSize="16"
+                                 FontAttributes="Bold"
+                                 />
+                              <Label
+                                Text="{Binding AddressAndName}"
+                                 FontSize="15"/>
+                            </StackLayout>
+                             <StackLayout HorizontalOptions="Center">
+                             <Button Text="连接"
+                                     BorderWidth="1.5"
                                    Command="{Binding ConnectToDeviceCommand}"
-                                   HorizontalOptions="EndAndExpand">
+                                   HorizontalOptions="Center">
                               <Button.TextColor>
                                  <OnPlatform x:TypeArguments="Color"
-                                             WinPhone="DarkOrange" />
+                                            WinPhone ="DarkOrange" />
                               </Button.TextColor>
-                           </Button>
+                             </Button>
+                              <Button Text="断开"
+                                      BorderWidth="1.5"
+                                   Command="{Binding DisconnectedToDeviceCommand}"
+                                   HorizontalOptions="Center">
+                              <Button.TextColor>
+                                 <OnPlatform x:TypeArguments="Color"
+                                            WinPhone ="DarkOrange" />
+                              </Button.TextColor>
+                             </Button>
+                           </StackLayout>
+                            <StackLayout>
+                              <Label
+                                 Text="颜色"
+                                 FontSize="16"
+                                 FontAttributes="Bold"
+                                 />
+                              <Button
+                                 BackgroundColor="Red"
+                                 CornerRadius = "5"
+                                 BorderColor = "#D7D5D5"
+                                 BorderWidth = "3"
+                                 WidthRequest = "30"
+                                 HeightRequest = "35"
+                                 />
+                            </StackLayout>
                         </StackLayout>
-                     </Grid>
                   </Frame>
                </ViewCell>
             </DataTemplate>

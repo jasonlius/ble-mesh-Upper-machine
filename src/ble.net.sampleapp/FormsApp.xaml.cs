@@ -6,11 +6,13 @@
 
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using Acr.UserDialogs;
 using ble.net.sampleapp.view;
 using ble.net.sampleapp.viewmodel;
 using nexus.core.logging;
 using nexus.protocols.ble;
+using nexus.protocols.ble.scan;
 using Xamarin.Forms;
 using Device = Xamarin.Forms.Device;
 #if RELEASE
@@ -25,11 +27,9 @@ namespace ble.net.sampleapp
    {
       private readonly IUserDialogs m_dialogs;
       private readonly NavigationPage m_rootPage;
-
-      public FormsApp( IBluetoothLowEnergyAdapter adapter, IUserDialogs dialogs )
+      public FormsApp(IBluetoothLowEnergyAdapter adapter, IUserDialogs dialogs)
       {
          InitializeComponent();
-
          m_dialogs = dialogs;
          var logsVm = new LogsViewModel();
          SystemLog.Instance.AddSink( logsVm );
@@ -38,28 +38,44 @@ namespace ble.net.sampleapp
          Log.Info( bleAssembly.Name + "@" + bleAssembly.Version );
 
          var bleGattServerViewModel = new BleGattServerViewModel( dialogs, adapter );
+
+         // pass delegate parameter!!
          var bleScanViewModel = new BleDeviceScannerViewModel(
             bleAdapter: adapter,
             dialogs: dialogs,
             onSelectDevice: async p =>
             {
-               await bleGattServerViewModel.Update( p );
+               await bleGattServerViewModel.Update(p);
                await m_rootPage.PushAsync(
                   new BleGattServerPage(
                      model: bleGattServerViewModel,
                      bleServiceSelected: async s => { await m_rootPage.PushAsync( new BleGattServicePage( s ) ); } ) );
                await bleGattServerViewModel.OpenConnection();
-            } );
+            },
+             offSelectDevice: async p =>
+             {
+                //await bleGattServerViewModel.Update(p);
+                await m_rootPage.PushAsync(
+                   new BleGattServerPage(
+                      model: bleGattServerViewModel,
+                      bleServiceSelected: async s => { await m_rootPage.PushAsync(new BleGattServicePage(s)); }));
+                await bleGattServerViewModel.OffConnection();
+             }
+            );
 
          m_rootPage = new NavigationPage(
             new TabbedPage
             {
-               Title = "BLE.net Sample App",
+               Title = "基于BLE的Mesh节点上位机",
                Children = {new BleDeviceScannerPage( bleScanViewModel ), new LogsPage( logsVm )}
             } );
 
+         bleGattServerViewModel.SetDeviceScannerViewNodel(bleScanViewModel);
+         
          MainPage = m_rootPage;
       }
+
+
 
       /// <inheritdoc />
       protected override void OnStart()

@@ -17,8 +17,7 @@ using nexus.protocols.ble;
 using Xamarin.Forms;
 namespace ble.net.sampleapp.viewmodel
 {
-
-   //你他电话给发粉丝v不会v发i就是结果
+   
    public abstract class AbstractScanViewModel : BaseViewModel
    {
       protected readonly IBluetoothLowEnergyAdapter m_bleAdapter;

@@ -20,6 +20,10 @@ using nexus.protocols.ble.scan;
 using Xamarin.Forms;
 namespace ble.net.sampleapp.viewmodel
 {
+
+   /// <summary>
+   /// tset
+   /// </summary>
    public class BleDeviceScannerViewModel : AbstractScanViewModel
    {
       private readonly Func<BlePeripheralViewModel, Task> m_onSelectDevice;

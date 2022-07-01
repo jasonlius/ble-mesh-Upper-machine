@@ -17,7 +17,11 @@ using nexus.protocols.ble;
 using Xamarin.Forms;
 namespace ble.net.sampleapp.viewmodel
 {
+<<<<<<< HEAD
    
+=======
+
+>>>>>>> 4cc7cccf22a88f4dd4e9b261ef68b1502426009a
    public abstract class AbstractScanViewModel : BaseViewModel
    {
       protected readonly IBluetoothLowEnergyAdapter m_bleAdapter;
